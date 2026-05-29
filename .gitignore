@@ -1,15 +1,25 @@
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.egg-info/
 dist/
 build/
-.eggs/
 *.egg
-.ruff_cache/
-.mypy_cache/
-.pytest_cache/
-.coverage
-htmlcov/
+
+# Virtual environments
 .venv/
 venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# OS
+.DS_Store

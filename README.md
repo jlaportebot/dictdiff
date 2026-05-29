@@ -1,113 +1,59 @@
 # dictdiff
 
-Smart structural diff for JSON, YAML, and TOML files — see exactly what changed, key by key.
+Semantic dict/JSON diff tool with rich terminal output.
 
-## Why?
+## Features
 
-Standard diff tools work line-by-line. But when comparing config files, API responses, or data schemas, you want to know **which keys changed**, not which lines moved. `dictdiff` understands structure:
+- **Deep recursive diff** — compares nested dicts, lists, and scalars
+- **Type-change detection** — flags when a key's value type changes (e.g. `"42"` → `42`)
+- **Set-aware list diff** — optional set-mode for unordered list comparison
+- **Rich terminal output** — color-coded, side-by-side or unified view
+- **Multiple formats** — JSON, YAML, Python dict files as input
+- **Exit codes** — 0 if identical, 1 if differences, 2 on error
+- **Library API** — use `dictdiff.diff()` in your own Python code
+- **Patch generation** — output a JSON patch (RFC 6902) describing changes
 
-- ✅ Detects **added**, **removed**, **type-changed**, and **value-changed** keys
-- ✅ Recursively diffs nested dicts
-- ✅ Works with **JSON**, **YAML**, and **TOML** (and can mix them!)
-- ✅ Beautiful tree output, flat mode, or JSON output for scripting
-- ✅ Proper exit codes (0 = identical, 1 = different, 2 = error)
-
-## Install
+## Installation
 
 ```bash
 pip install dictdiff
 ```
 
-For TOML support on Python < 3.11:
+## CLI Usage
 
 ```bash
-pip install dictdiff[toml]
+# Compare two JSON files
+dictdiff file1.json file2.json
+
+# Compare two YAML files
+dictdiff config-old.yaml config-new.yaml
+
+# Pipe JSON from stdin
+dictdiff - < new.json
+
+# Output as JSON patch (RFC 6902)
+dictdiff --patch old.json new.json
+
+# Set-mode for unordered list comparison
+dictdiff --set-mode a.json b.json
+
+# Quiet mode — exit code only
+dictdiff -q a.json b.json
 ```
 
-## Usage
-
-```bash
-# Basic: compare two files (format auto-detected by extension)
-dictdiff old.json new.json
-
-# Compare YAML files
-dictdiff config-v1.yaml config-v2.yaml
-
-# Mix formats! JSON vs YAML
-dictdiff baseline.json updated.yaml
-
-# Flat output (one change per line, great for scripting)
-dictdiff -f flat old.json new.json
-
-# JSON output (for piping to jq, etc.)
-dictdiff -f json old.json new.json
-
-# Quiet mode — just exit code, no output
-dictdiff -q old.json new.json
-echo $?  # 0 if identical, 1 if different
-
-# No color
-dictdiff --no-color old.json new.json
-```
-
-## Example
-
-```json
-// old.json
-{
-  "database": {
-    "host": "localhost",
-    "port": 5432,
-    "name": "myapp"
-  },
-  "debug": true
-}
-```
-
-```json
-// new.json
-{
-  "database": {
-    "host": "db.example.com",
-    "port": 5432,
-    "name": "myapp_prod"
-  },
-  "debug": false,
-  "logging": "verbose"
-}
-```
-
-```
-$ dictdiff old.json new.json
-dictdiff
- ├─ 🔧 database  (1 value_changed)
- │   ├─ ≠ database.host  'localhost' → 'db.example.com'
- │   └─ ≠ database.name  'myapp' → 'myapp_prod'
- ├─ ≠ debug  True → False
- └─ + logging  = 'verbose'
-
-  1 value_changed  1 added  1 changed
-```
-
-## Output Formats
-
-| Format | Flag | Use When |
-|--------|------|----------|
-| Tree (default) | `-f tree` | Human review, understanding structure |
-| Flat | `-f flat` | Quick scanning, grep-friendly |
-| JSON | `-f json` | Programmatic use, piping to `jq` |
-
-## As a Library
+## Python API
 
 ```python
-from dictdiff import diff_dicts, load_file, flatten
+from dictdiff import diff
 
-old = load_file("config-v1.yaml")
-new = load_file("config-v2.yaml")
-
-entries = diff_dicts(old, new)
-for change in flatten(entries):
-    print(f"{change.kind.value}: {change.path}")
+result = diff(
+    {"a": 1, "b": [1, 2, 3]},
+    {"a": 1, "b": [1, 2, 4], "c": "new"},
+)
+# result.added    → {"c": "new"}
+# result.removed  → {}
+# result.changed  → {"b": Change(old=[1,2,3], new=[1,2,4])}
+# result.type_changed → {}
 ```
 
 ## License
