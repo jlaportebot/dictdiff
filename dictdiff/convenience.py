@@ -8,6 +8,8 @@ from typing import Any
 
 from dictdiff.core import DiffResult, diff
 from dictdiff.patch import generate_patch
+from dictdiff.loader import load_file, load_string, detect_format
+from dictdiff.ignore import IgnoreMatcher, filter_dict
 
 
 def diff_files(
@@ -17,22 +19,41 @@ def diff_files(
     set_mode: bool = False,
     ignore_keys: set[str] | None = None,
     float_tolerance: float = 0.0,
+    lcs_mode: bool = False,
+    ignore_patterns: list[str] | None = None,
 ) -> DiffResult:
-    """Compare two JSON files and return a DiffResult.
+    """Compare two data files and return a DiffResult.
+
+    Supports JSON, YAML, TOML, INI, and Python dict files.
 
     Args:
-        old_path: Path to the original JSON file.
-        new_path: Path to the new JSON file.
+        old_path: Path to the original file.
+        new_path: Path to the new file.
         set_mode: If True, compare lists as unordered sets.
         ignore_keys: Set of dict keys to skip during comparison.
         float_tolerance: Tolerance for float comparison.
+        lcs_mode: If True, use LCS-based list comparison.
+        ignore_patterns: List of ignore patterns (glob/regex/exact/dotpath).
 
     Returns:
         DiffResult with structured differences.
     """
-    old_data = _load_json(old_path)
-    new_data = _load_json(new_path)
-    return diff(old_data, new_data, set_mode=set_mode, ignore_keys=ignore_keys, float_tolerance=float_tolerance)
+    old_data = load_file(old_path)
+    new_data = load_file(new_path)
+
+    # Apply ignore patterns if provided
+    if ignore_patterns:
+        matcher = IgnoreMatcher.from_patterns(ignore_patterns)
+        old_data = filter_dict(old_data, matcher) if isinstance(old_data, dict) else old_data
+        new_data = filter_dict(new_data, matcher) if isinstance(new_data, dict) else new_data
+
+    return diff(
+        old_data, new_data,
+        set_mode=set_mode,
+        ignore_keys=ignore_keys,
+        float_tolerance=float_tolerance,
+        lcs_mode=lcs_mode,
+    )
 
 
 def diff_strings(
@@ -42,22 +63,32 @@ def diff_strings(
     set_mode: bool = False,
     ignore_keys: set[str] | None = None,
     float_tolerance: float = 0.0,
+    lcs_mode: bool = False,
+    format: str = "json",
 ) -> DiffResult:
-    """Compare two JSON strings and return a DiffResult.
+    """Compare two data strings and return a DiffResult.
 
     Args:
-        old_json: Original JSON string.
-        new_json: New JSON string.
+        old_json: Original data string.
+        new_json: New data string.
         set_mode: If True, compare lists as unordered sets.
         ignore_keys: Set of dict keys to skip during comparison.
         float_tolerance: Tolerance for float comparison.
+        lcs_mode: If True, use LCS-based list comparison.
+        format: Input format — "json", "yaml", or "toml".
 
     Returns:
         DiffResult with structured differences.
     """
-    old_data = json.loads(old_json)
-    new_data = json.loads(new_json)
-    return diff(old_data, new_data, set_mode=set_mode, ignore_keys=ignore_keys, float_tolerance=float_tolerance)
+    old_data = load_string(old_json, format=format)
+    new_data = load_string(new_json, format=format)
+    return diff(
+        old_data, new_data,
+        set_mode=set_mode,
+        ignore_keys=ignore_keys,
+        float_tolerance=float_tolerance,
+        lcs_mode=lcs_mode,
+    )
 
 
 def diff_to_patch(
@@ -67,6 +98,7 @@ def diff_to_patch(
     set_mode: bool = False,
     ignore_keys: set[str] | None = None,
     float_tolerance: float = 0.0,
+    lcs_mode: bool = False,
 ) -> list[dict[str, Any]]:
     """Compare two values and return an RFC 6902 JSON Patch.
 
@@ -78,15 +110,16 @@ def diff_to_patch(
         set_mode: If True, compare lists as unordered sets.
         ignore_keys: Set of dict keys to skip during comparison.
         float_tolerance: Tolerance for float comparison.
+        lcs_mode: If True, use LCS-based list comparison.
 
     Returns:
         List of RFC 6902 patch operations.
     """
-    result = diff(old, new, set_mode=set_mode, ignore_keys=ignore_keys, float_tolerance=float_tolerance)
+    result = diff(
+        old, new,
+        set_mode=set_mode,
+        ignore_keys=ignore_keys,
+        float_tolerance=float_tolerance,
+        lcs_mode=lcs_mode,
+    )
     return generate_patch(result)
-
-
-def _load_json(path: str | Path) -> Any:
-    """Load a JSON file."""
-    p = Path(path)
-    return json.loads(p.read_text(encoding="utf-8"))
