@@ -4,7 +4,6 @@ import json
 import os
 import tempfile
 import time
-import pytest
 from pathlib import Path
 
 from dictdiff.watcher import FileWatcher, MultiFileWatcher
@@ -91,7 +90,7 @@ class TestFileWatcher:
     def test_nonexistent_file(self):
         watcher = FileWatcher("/nonexistent/old.json", "/nonexistent/new.json")
         # Should not crash on check
-        result = watcher.check()
+        _ = watcher.check()
         # Should still return a result (empty)
 
     def test_stop(self):

@@ -1,8 +1,6 @@
 """Tests for dictdiff convenience functions."""
 
 import json
-import pytest
-from pathlib import Path
 
 from dictdiff.convenience import diff_files, diff_strings, diff_to_patch
 from dictdiff.core import Change

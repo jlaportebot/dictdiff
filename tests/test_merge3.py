@@ -1,6 +1,5 @@
 """Tests for the three-way merge module."""
 
-import pytest
 from dictdiff.merge3 import merge3, MergeResult
 
 

@@ -67,7 +67,9 @@ def _values_equal(a: Any, b: Any) -> bool:
     return a == b
 
 
-def diff_dicts(old: dict[str, Any], new: dict[str, Any], path: str = "") -> list[DiffEntry]:
+def diff_dicts(
+    old: dict[str, Any], new: dict[str, Any], path: str = ""
+) -> list[DiffEntry]:
     """Recursively diff two dicts and return a list of DiffEntry objects.
 
     Only returns entries that represent actual changes (kind != UNCHANGED),
@@ -82,11 +84,15 @@ def diff_dicts(old: dict[str, Any], new: dict[str, Any], path: str = "") -> list
         in_new = key in new
 
         if in_old and not in_new:
-            results.append(DiffEntry(path=key_path, kind=ChangeKind.REMOVED, old_value=old[key]))
+            results.append(
+                DiffEntry(path=key_path, kind=ChangeKind.REMOVED, old_value=old[key])
+            )
             continue
 
         if not in_old and in_new:
-            results.append(DiffEntry(path=key_path, kind=ChangeKind.ADDED, new_value=new[key]))
+            results.append(
+                DiffEntry(path=key_path, kind=ChangeKind.ADDED, new_value=new[key])
+            )
             continue
 
         old_val = old[key]

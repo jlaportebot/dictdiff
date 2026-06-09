@@ -68,7 +68,11 @@ def main(argv: list[str] | None = None) -> int:
     entries = diff_dicts(old_data, new_data)
 
     if args.quiet:
-        return 0 if not any(e.kind.value != "unchanged" and not e.children for e in entries) else 1
+        return (
+            0
+            if not any(e.kind.value != "unchanged" and not e.children for e in entries)
+            else 1
+        )
 
     if args.format == "tree":
         render_tree(entries, console)

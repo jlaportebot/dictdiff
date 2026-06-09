@@ -43,10 +43,14 @@ def extract_path(data: Any, dot_path: str) -> Any:
             except ValueError:
                 raise ValueError(f"Invalid list index '{token}' at path '{dot_path}'")
             if idx < 0 or idx >= len(current):
-                raise IndexError(f"Index {idx} out of range (len={len(current)}) at path '{dot_path}'")
+                raise IndexError(
+                    f"Index {idx} out of range (len={len(current)}) at path '{dot_path}'"
+                )
             current = current[idx]
         else:
-            raise ValueError(f"Cannot traverse into {type(current).__name__} at path '{dot_path}'")
+            raise ValueError(
+                f"Cannot traverse into {type(current).__name__} at path '{dot_path}'"
+            )
 
     return current
 
@@ -150,7 +154,9 @@ def list_paths(data: Any, *, prefix: str = "") -> list[str]:
     return paths
 
 
-def diff_paths(old: Any, new: Any, paths: list[str]) -> dict[str, tuple[Any, Any | None]]:
+def diff_paths(
+    old: Any, new: Any, paths: list[str]
+) -> dict[str, tuple[Any, Any | None]]:
     """Compare specific paths between two data structures.
 
     Args:

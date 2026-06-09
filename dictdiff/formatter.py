@@ -9,10 +9,12 @@ from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree
 
-from dictdiff.core import Change, DiffResult
+from dictdiff.core import DiffResult
 
 
-def format_diff(result: DiffResult, *, title: str = "Diff", show_types: bool = True) -> None:
+def format_diff(
+    result: DiffResult, *, title: str = "Diff", show_types: bool = True
+) -> None:
     """Print a rich, color-coded diff to the terminal.
 
     Args:
@@ -48,7 +50,9 @@ def format_diff(result: DiffResult, *, title: str = "Diff", show_types: bool = T
     console.print(tree)
 
 
-def _build_tree(tree: Tree, result: DiffResult, *, prefix: str = "", show_types: bool = True) -> None:
+def _build_tree(
+    tree: Tree, result: DiffResult, *, prefix: str = "", show_types: bool = True
+) -> None:
     """Recursively build a rich Tree from a DiffResult."""
     # Added
     for key, value in result.added.items():
@@ -78,7 +82,10 @@ def _build_tree(tree: Tree, result: DiffResult, *, prefix: str = "", show_types:
         label = Text()
         label.append(f"⇄ {prefix}{key}", style="magenta")
         if show_types:
-            label.append(f" ({type(change.old).__name__}→{type(change.new).__name__})", style="magenta dim")
+            label.append(
+                f" ({type(change.old).__name__}→{type(change.new).__name__})",
+                style="magenta dim",
+            )
         label.append(f": {_format_value(change.old)}", style="red strike")
         label.append(" → ", style="magenta")
         label.append(f"{_format_value(change.new)}", style="green")
@@ -92,7 +99,9 @@ def _build_tree(tree: Tree, result: DiffResult, *, prefix: str = "", show_types:
             _build_tree(branch, child, prefix=child_prefix, show_types=show_types)
 
 
-def format_unified(result: DiffResult, *, old_label: str = "old", new_label: str = "new") -> str:
+def format_unified(
+    result: DiffResult, *, old_label: str = "old", new_label: str = "new"
+) -> str:
     """Generate a unified-diff-style text output.
 
     Args:
@@ -125,8 +134,12 @@ def _collect_unified(result: DiffResult, lines: list[str], *, prefix: str) -> No
         lines.append(f"+{prefix}{key}: {_format_value(change.new)}")
 
     for key, change in result.type_changed.items():
-        lines.append(f"-{prefix}{key}: ({type(change.old).__name__}) {_format_value(change.old)}")
-        lines.append(f"+{prefix}{key}: ({type(change.new).__name__}) {_format_value(change.new)}")
+        lines.append(
+            f"-{prefix}{key}: ({type(change.old).__name__}) {_format_value(change.old)}"
+        )
+        lines.append(
+            f"+{prefix}{key}: ({type(change.new).__name__}) {_format_value(change.new)}"
+        )
 
     for key, child in result.children.items():
         _collect_unified(child, lines, prefix=f"{prefix}{key}.")
@@ -159,13 +172,22 @@ def format_table(result: DiffResult, *, title: str = "Diff") -> None:
 def _collect_table_rows(result: DiffResult, table: Table, *, prefix: str) -> None:
     """Recursively add rows to a rich Table."""
     for key, value in result.added.items():
-        table.add_row(f"{prefix}{key}", "[green]added[/green]", "—", str(_format_value(value)))
+        table.add_row(
+            f"{prefix}{key}", "[green]added[/green]", "—", str(_format_value(value))
+        )
 
     for key, value in result.removed.items():
-        table.add_row(f"{prefix}{key}", "[red]removed[/red]", str(_format_value(value)), "—")
+        table.add_row(
+            f"{prefix}{key}", "[red]removed[/red]", str(_format_value(value)), "—"
+        )
 
     for key, change in result.changed.items():
-        table.add_row(f"{prefix}{key}", "[yellow]changed[/yellow]", str(_format_value(change.old)), str(_format_value(change.new)))
+        table.add_row(
+            f"{prefix}{key}",
+            "[yellow]changed[/yellow]",
+            str(_format_value(change.old)),
+            str(_format_value(change.new)),
+        )
 
     for key, change in result.type_changed.items():
         table.add_row(

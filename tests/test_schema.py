@@ -1,8 +1,6 @@
 """Tests for the schema validation module."""
 
-import pytest
 from dictdiff.schema import (
-    SchemaError,
     ValidationResult,
     AnyType,
     StringType,
@@ -383,29 +381,42 @@ class TestSchemaComplex:
         # Valid config
         assert validate(
             {
-                "database": {"host": "localhost", "port": 5432, "name": "mydb", "ssl": True},
+                "database": {
+                    "host": "localhost",
+                    "port": 5432,
+                    "name": "mydb",
+                    "ssl": True,
+                },
                 "logging": {"level": "INFO", "file": "/var/log/app.log"},
             },
             config_schema,
         ).is_valid
 
         # Missing required database
-        assert validate({"logging": {"level": "DEBUG"}}, config_schema).is_valid is False
+        assert (
+            validate({"logging": {"level": "DEBUG"}}, config_schema).is_valid is False
+        )
 
         # Invalid port
-        assert validate(
-            {"database": {"host": "localhost", "port": 99999, "name": "mydb"}},
-            config_schema,
-        ).is_valid is False
+        assert (
+            validate(
+                {"database": {"host": "localhost", "port": 99999, "name": "mydb"}},
+                config_schema,
+            ).is_valid
+            is False
+        )
 
         # Invalid enum value
-        assert validate(
-            {
-                "database": {"host": "localhost", "port": 5432, "name": "mydb"},
-                "logging": {"level": "VERBOSE"},
-            },
-            config_schema,
-        ).is_valid is False
+        assert (
+            validate(
+                {
+                    "database": {"host": "localhost", "port": 5432, "name": "mydb"},
+                    "logging": {"level": "VERBOSE"},
+                },
+                config_schema,
+            ).is_valid
+            is False
+        )
 
     def test_array_of_objects(self):
         item_schema = DictType(
@@ -422,9 +433,8 @@ class TestSchemaComplex:
         inner = DictType(required_keys={"value": IntType()})
         middle = DictType(required_keys={"inner": inner})
         outer = DictType(required_keys={"middle": middle})
-        assert validate(
-            {"middle": {"inner": {"value": 42}}}, outer
-        ).is_valid
-        assert validate(
-            {"middle": {"inner": {"value": "not_int"}}}, outer
-        ).is_valid is False
+        assert validate({"middle": {"inner": {"value": 42}}}, outer).is_valid
+        assert (
+            validate({"middle": {"inner": {"value": "not_int"}}}, outer).is_valid
+            is False
+        )

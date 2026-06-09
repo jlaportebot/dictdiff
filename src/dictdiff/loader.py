@@ -13,7 +13,9 @@ def _load_json(path: Path) -> dict[str, Any]:
     with path.open() as f:
         data = json.load(f)
     if not isinstance(data, dict):
-        raise ValueError(f"Expected a JSON object (dict) in {path}, got {type(data).__name__}")
+        raise ValueError(
+            f"Expected a JSON object (dict) in {path}, got {type(data).__name__}"
+        )
     return data
 
 
@@ -23,7 +25,9 @@ def _load_yaml(path: Path) -> dict[str, Any]:
     if data is None:
         return {}
     if not isinstance(data, dict):
-        raise ValueError(f"Expected a YAML mapping in {path}, got {type(data).__name__}")
+        raise ValueError(
+            f"Expected a YAML mapping in {path}, got {type(data).__name__}"
+        )
     return data
 
 

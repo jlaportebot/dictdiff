@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from dictdiff.core import Change, DiffResult
+from dictdiff.core import DiffResult
 
 
 def generate_patch(result: DiffResult, path: str = "") -> list[dict[str, Any]]:
@@ -34,11 +34,15 @@ def generate_patch(result: DiffResult, path: str = "") -> list[dict[str, Any]]:
 
     # Changed values
     for key, change in result.changed.items():
-        ops.append({"op": "replace", "path": f"{path}/{_escape(key)}", "value": change.new})
+        ops.append(
+            {"op": "replace", "path": f"{path}/{_escape(key)}", "value": change.new}
+        )
 
     # Type changes
     for key, change in result.type_changed.items():
-        ops.append({"op": "replace", "path": f"{path}/{_escape(key)}", "value": change.new})
+        ops.append(
+            {"op": "replace", "path": f"{path}/{_escape(key)}", "value": change.new}
+        )
 
     # Recurse into children
     for key, child in result.children.items():

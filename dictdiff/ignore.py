@@ -66,11 +66,17 @@ class IgnoreMatcher:
 
     def add_glob(self, pattern: str, *, case_sensitive: bool = True) -> None:
         """Add a glob-pattern rule (e.g. 'metadata.*', 'timestamp')."""
-        self.rules.append(IgnoreRule(pattern=pattern, rule_type="glob", case_sensitive=case_sensitive))
+        self.rules.append(
+            IgnoreRule(pattern=pattern, rule_type="glob", case_sensitive=case_sensitive)
+        )
 
     def add_regex(self, pattern: str, *, case_sensitive: bool = True) -> None:
         """Add a regex-pattern rule."""
-        self.rules.append(IgnoreRule(pattern=pattern, rule_type="regex", case_sensitive=case_sensitive))
+        self.rules.append(
+            IgnoreRule(
+                pattern=pattern, rule_type="regex", case_sensitive=case_sensitive
+            )
+        )
 
     def add_prefix(self, prefix: str) -> None:
         """Add a prefix rule — matches any path starting with this prefix."""

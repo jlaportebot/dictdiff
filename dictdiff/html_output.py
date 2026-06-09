@@ -10,7 +10,7 @@ import html
 from datetime import datetime, timezone
 from typing import Any
 
-from dictdiff.core import Change, DiffResult
+from dictdiff.core import DiffResult
 
 
 def format_html(
@@ -38,7 +38,11 @@ def format_html(
         Complete HTML string.
     """
     summary = result.summary()
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC") if include_timestamp else ""
+    timestamp = (
+        datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+        if include_timestamp
+        else ""
+    )
 
     rows_html = _build_rows(result, prefix="")
     summary_html = _build_summary(summary) if include_summary else ""
@@ -65,7 +69,7 @@ def format_html(
 <body>
 <div class="container">
 <h1>{html.escape(title)}</h1>
-{f'<p class="timestamp">Generated: {html.escape(timestamp)}</p>' if timestamp else ''}
+{f'<p class="timestamp">Generated: {html.escape(timestamp)}</p>' if timestamp else ""}
 {summary_html}
 <table>
 <thead>
@@ -147,11 +151,11 @@ def _build_rows(result: DiffResult, *, prefix: str) -> str:
         path = f"{prefix}{key}"
         rows.append(
             f'<tr class="added">'
-            f'<td>{html.escape(path)}</td>'
+            f"<td>{html.escape(path)}</td>"
             f'<td><span class="badge added">added</span></td>'
             f'<td class="empty">—</td>'
-            f'<td>{html.escape(_fmt(value))}</td>'
-            f'</tr>'
+            f"<td>{html.escape(_fmt(value))}</td>"
+            f"</tr>"
         )
 
     # Removed
@@ -159,11 +163,11 @@ def _build_rows(result: DiffResult, *, prefix: str) -> str:
         path = f"{prefix}{key}"
         rows.append(
             f'<tr class="removed">'
-            f'<td>{html.escape(path)}</td>'
+            f"<td>{html.escape(path)}</td>"
             f'<td><span class="badge removed">removed</span></td>'
             f'<td class="strike">{html.escape(_fmt(value))}</td>'
             f'<td class="empty">—</td>'
-            f'</tr>'
+            f"</tr>"
         )
 
     # Changed
@@ -171,11 +175,11 @@ def _build_rows(result: DiffResult, *, prefix: str) -> str:
         path = f"{prefix}{key}"
         rows.append(
             f'<tr class="changed">'
-            f'<td>{html.escape(path)}</td>'
+            f"<td>{html.escape(path)}</td>"
             f'<td><span class="badge changed">changed</span></td>'
             f'<td class="strike">{html.escape(_fmt(change.old))}</td>'
-            f'<td>{html.escape(_fmt(change.new))}</td>'
-            f'</tr>'
+            f"<td>{html.escape(_fmt(change.new))}</td>"
+            f"</tr>"
         )
 
     # Type changed
@@ -185,11 +189,11 @@ def _build_rows(result: DiffResult, *, prefix: str) -> str:
         new_type = type(change.new).__name__
         rows.append(
             f'<tr class="type-changed">'
-            f'<td>{html.escape(path)}</td>'
+            f"<td>{html.escape(path)}</td>"
             f'<td><span class="badge type-changed">{html.escape(old_type)}→{html.escape(new_type)}</span></td>'
             f'<td class="strike">{html.escape(_fmt(change.old))}</td>'
-            f'<td>{html.escape(_fmt(change.new))}</td>'
-            f'</tr>'
+            f"<td>{html.escape(_fmt(change.new))}</td>"
+            f"</tr>"
         )
 
     # Children
@@ -210,7 +214,9 @@ def _build_summary(summary: dict[str, int]) -> str:
     if summary["changed"]:
         parts.append(f'<span class="stat changed">~{summary["changed"]} changed</span>')
     if summary["type_changed"]:
-        parts.append(f'<span class="stat type-changed">⇄{summary["type_changed"]} type changed</span>')
+        parts.append(
+            f'<span class="stat type-changed">⇄{summary["type_changed"]} type changed</span>'
+        )
 
     if not parts:
         return '<div class="summary">No differences found.</div>'
@@ -226,7 +232,7 @@ def _build_legend() -> str:
         '<span class="badge removed">removed</span> '
         '<span class="badge changed">changed</span> '
         '<span class="badge type-changed">type changed</span>'
-        '</span>'
+        "</span>"
     )
 
 

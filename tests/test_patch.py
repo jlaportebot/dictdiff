@@ -1,7 +1,5 @@
 """Tests for dictdiff patch generation and application."""
 
-import json
-
 import pytest
 from dictdiff.core import diff
 from dictdiff.patch import apply_patch, generate_patch
@@ -128,8 +126,20 @@ class TestPatchApplication:
 
     def test_roundtrip_complex(self):
         """More complex roundtrip test."""
-        old = {"config": {"db": {"host": "localhost", "port": 5432}, "cache": {"enabled": True}}, "version": 1}
-        new = {"config": {"db": {"host": "prod-server", "port": 5432}, "cache": {"enabled": False, "ttl": 300}}, "version": 2}
+        old = {
+            "config": {
+                "db": {"host": "localhost", "port": 5432},
+                "cache": {"enabled": True},
+            },
+            "version": 1,
+        }
+        new = {
+            "config": {
+                "db": {"host": "prod-server", "port": 5432},
+                "cache": {"enabled": False, "ttl": 300},
+            },
+            "version": 2,
+        }
         result = diff(old, new)
         ops = generate_patch(result)
         patched = apply_patch(old, ops)

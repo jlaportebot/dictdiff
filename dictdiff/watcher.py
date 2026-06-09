@@ -83,7 +83,9 @@ class FileWatcher:
                 try:
                     import tomli as tomllib  # type: ignore[no-redef]
                 except ImportError:
-                    raise ImportError("TOML support requires Python 3.11+ or 'tomli' package")
+                    raise ImportError(
+                        "TOML support requires Python 3.11+ or 'tomli' package"
+                    )
             return tomllib.loads(path.read_text(encoding="utf-8"))
         else:
             return json.loads(path.read_text(encoding="utf-8"))
@@ -160,7 +162,9 @@ class FileWatcher:
         # Default: print to stdout
         summary = result.summary()
         print(f"\n--- Change #{self._change_count} detected ---")
-        print(f"  +{summary['added']} added  -{summary['removed']} removed  ~{summary['changed']} changed  ⇄{summary['type_changed']} type changed")
+        print(
+            f"  +{summary['added']} added  -{summary['removed']} removed  ~{summary['changed']} changed  ⇄{summary['type_changed']} type changed"
+        )
 
         if self.output_format == "unified":
             output = format_unified(result)
@@ -171,17 +175,21 @@ class FileWatcher:
             print(json.dumps(ops, indent=2))
         elif self.output_format == "json":
             from dictdiff.cli import _result_to_json
+
             print(json.dumps(_result_to_json(result), indent=2))
         else:
             # tree format (rich)
             from dictdiff.formatter import format_diff
+
             format_diff(result, title=f"Change #{self._change_count}")
 
 
 class MultiFileWatcher:
     """Watch multiple file pairs simultaneously."""
 
-    def __init__(self, *, poll_interval: float = 1.0, output_format: str = "tree") -> None:
+    def __init__(
+        self, *, poll_interval: float = 1.0, output_format: str = "tree"
+    ) -> None:
         self.poll_interval = poll_interval
         self.output_format = output_format
         self.watchers: list[FileWatcher] = []

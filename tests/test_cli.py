@@ -1,8 +1,6 @@
 """Tests for dictdiff CLI."""
 
 import json
-import tempfile
-from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
@@ -111,7 +109,10 @@ class TestCLIIgnore:
         assert result.exit_code == 1
 
     def test_ignore_all_changed_keys(self, runner, json_old, json_new):
-        result = runner.invoke(main, ["--ignore", "b", "--ignore", "c", "--ignore", "d", json_old, json_new])
+        result = runner.invoke(
+            main,
+            ["--ignore", "b", "--ignore", "c", "--ignore", "d", json_old, json_new],
+        )
         assert result.exit_code == 0
 
 

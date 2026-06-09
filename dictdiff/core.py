@@ -64,23 +64,46 @@ class DiffResult:
         items: list[dict[str, Any]] = []
 
         for key, value in self.added.items():
-            items.append({"path": f"{prefix}{key}", "change_type": "added", "old": None, "new": value})
+            items.append(
+                {
+                    "path": f"{prefix}{key}",
+                    "change_type": "added",
+                    "old": None,
+                    "new": value,
+                }
+            )
 
         for key, value in self.removed.items():
-            items.append({"path": f"{prefix}{key}", "change_type": "removed", "old": value, "new": None})
+            items.append(
+                {
+                    "path": f"{prefix}{key}",
+                    "change_type": "removed",
+                    "old": value,
+                    "new": None,
+                }
+            )
 
         for key, change in self.changed.items():
-            items.append({"path": f"{prefix}{key}", "change_type": "changed", "old": change.old, "new": change.new})
+            items.append(
+                {
+                    "path": f"{prefix}{key}",
+                    "change_type": "changed",
+                    "old": change.old,
+                    "new": change.new,
+                }
+            )
 
         for key, change in self.type_changed.items():
-            items.append({
-                "path": f"{prefix}{key}",
-                "change_type": "type_changed",
-                "old": change.old,
-                "new": change.new,
-                "old_type": type(change.old).__name__,
-                "new_type": type(change.new).__name__,
-            })
+            items.append(
+                {
+                    "path": f"{prefix}{key}",
+                    "change_type": "type_changed",
+                    "old": change.old,
+                    "new": change.new,
+                    "old_type": type(change.old).__name__,
+                    "new_type": type(change.new).__name__,
+                }
+            )
 
         for key, child in self.children.items():
             child_prefix = f"{prefix}{key}."
@@ -97,10 +120,17 @@ class DiffResult:
         if self.removed:
             output["removed"] = self.removed
         if self.changed:
-            output["changed"] = {k: {"old": v.old, "new": v.new} for k, v in self.changed.items()}
+            output["changed"] = {
+                k: {"old": v.old, "new": v.new} for k, v in self.changed.items()
+            }
         if self.type_changed:
             output["type_changed"] = {
-                k: {"old_type": type(v.old).__name__, "old": v.old, "new_type": type(v.new).__name__, "new": v.new}
+                k: {
+                    "old_type": type(v.old).__name__,
+                    "old": v.old,
+                    "new_type": type(v.new).__name__,
+                    "new": v.new,
+                }
                 for k, v in self.type_changed.items()
             }
         if self.children:
@@ -157,7 +187,8 @@ def diff(
     # Both dicts
     if isinstance(old, dict) and isinstance(new, dict):
         return _diff_dicts(
-            old, new,
+            old,
+            new,
             set_mode=set_mode,
             ignore_keys=ignore_keys,
             float_tolerance=float_tolerance,
@@ -168,7 +199,8 @@ def diff(
     # Both lists
     if isinstance(old, list) and isinstance(new, list):
         return _diff_lists(
-            old, new,
+            old,
+            new,
             set_mode=set_mode,
             float_tolerance=float_tolerance,
             lcs_mode=lcs_mode,
@@ -229,7 +261,8 @@ def _diff_dicts(
         # Both dicts — recurse
         if isinstance(old_val, dict) and isinstance(new_val, dict):
             child = _diff_dicts(
-                old_val, new_val,
+                old_val,
+                new_val,
                 set_mode=set_mode,
                 ignore_keys=ignore_keys,
                 float_tolerance=float_tolerance,
@@ -243,7 +276,8 @@ def _diff_dicts(
         # Both lists — recurse
         if isinstance(old_val, list) and isinstance(new_val, list):
             child = _diff_lists(
-                old_val, new_val,
+                old_val,
+                new_val,
                 set_mode=set_mode,
                 float_tolerance=float_tolerance,
                 lcs_mode=lcs_mode,
@@ -286,13 +320,15 @@ def _diff_lists(
     if lcs_mode:
         # Use LCS-based list comparison
         from dictdiff.lcs import diff_lcs_to_diff_result, compute_lcs
+
         lcs_result = diff_lcs_to_diff_result(old, new)
         # Recurse into common items that are dicts or lists
         matches = compute_lcs(old, new)
         for old_idx, new_idx in matches:
             if isinstance(old[old_idx], dict) and isinstance(new[new_idx], dict):
                 child = _diff_dicts(
-                    old[old_idx], new[new_idx],
+                    old[old_idx],
+                    new[new_idx],
                     set_mode=set_mode,
                     ignore_keys=set(),
                     float_tolerance=float_tolerance,
@@ -302,7 +338,8 @@ def _diff_lists(
                     result.children[str(old_idx)] = child
             elif isinstance(old[old_idx], list) and isinstance(new[new_idx], list):
                 child = _diff_lists(
-                    old[old_idx], new[new_idx],
+                    old[old_idx],
+                    new[new_idx],
                     set_mode=set_mode,
                     float_tolerance=float_tolerance,
                     lcs_mode=lcs_mode,
@@ -343,7 +380,8 @@ def _diff_lists(
 
             if isinstance(old_val, dict) and isinstance(new_val, dict):
                 child = _diff_dicts(
-                    old_val, new_val,
+                    old_val,
+                    new_val,
                     set_mode=set_mode,
                     ignore_keys=set(),
                     float_tolerance=float_tolerance,
@@ -355,7 +393,8 @@ def _diff_lists(
 
             if isinstance(old_val, list) and isinstance(new_val, list):
                 child = _diff_lists(
-                    old_val, new_val,
+                    old_val,
+                    new_val,
                     set_mode=set_mode,
                     float_tolerance=float_tolerance,
                     lcs_mode=lcs_mode,
@@ -396,7 +435,9 @@ def _to_hashable(item: Any) -> Any:
 
 def _unhash(item: Any) -> Any:
     """Convert a hashable representation back to normal form."""
-    if isinstance(item, tuple) and all(isinstance(x, tuple) and len(x) == 2 for x in item):
+    if isinstance(item, tuple) and all(
+        isinstance(x, tuple) and len(x) == 2 for x in item
+    ):
         return {k: _unhash(v) for k, v in item}
     if isinstance(item, tuple):
         return list(_unhash(i) for i in item)

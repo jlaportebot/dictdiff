@@ -7,8 +7,6 @@ from typing import Any
 from rich.console import Console
 from rich.tree import Tree
 from rich.text import Text
-from rich.panel import Panel
-from rich.table import Table
 
 from .differ import ChangeKind, DiffEntry, count_changes, flatten
 
@@ -112,9 +110,13 @@ def render_flat(entries: list[DiffEntry], console: Console | None = None) -> Non
         color = style["color"]
 
         if entry.kind == ChangeKind.ADDED:
-            console.print(f"[{color}]{icon} {entry.path} = {_format_value(entry.new_value)}[/{color}]")
+            console.print(
+                f"[{color}]{icon} {entry.path} = {_format_value(entry.new_value)}[/{color}]"
+            )
         elif entry.kind == ChangeKind.REMOVED:
-            console.print(f"[{color}]{icon} {entry.path} = {_format_value(entry.old_value)}[/{color}]")
+            console.print(
+                f"[{color}]{icon} {entry.path} = {_format_value(entry.old_value)}[/{color}]"
+            )
         elif entry.kind == ChangeKind.TYPE_CHANGED:
             console.print(
                 f"[{color}]{icon} {entry.path}: {entry.old_type} -> {entry.new_type}[/{color}]"

@@ -1,7 +1,13 @@
 """Tests for the LCS (Longest Common Subsequence) module."""
 
-import pytest
-from dictdiff.lcs import compute_lcs, lcs_length, diff_lcs, EditOp, EditScript, diff_lcs_to_diff_result
+from dictdiff.lcs import (
+    compute_lcs,
+    lcs_length,
+    diff_lcs,
+    EditOp,
+    EditScript,
+    diff_lcs_to_diff_result,
+)
 from dictdiff.core import DiffResult
 
 

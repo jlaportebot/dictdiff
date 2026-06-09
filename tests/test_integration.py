@@ -3,24 +3,20 @@
 import json
 import os
 import tempfile
-import pytest
 
-from dictdiff.core import diff, DiffResult, Change
+from dictdiff.core import diff, DiffResult
 from dictdiff.patch import generate_patch, apply_patch
 from dictdiff.convenience import diff_files, diff_strings
 from dictdiff.ignore import IgnoreMatcher, filter_dict
 from dictdiff.paths import extract_path, list_paths, path_exists, set_path, remove_path
-from dictdiff.loader import load_file, load_string, detect_format
 from dictdiff.merge3 import merge3
 from dictdiff.schema import (
     validate,
     StringType,
     IntType,
     DictType,
-    ListType,
-    EnumType,
 )
-from dictdiff.html_output import format_html, format_html_standalone
+from dictdiff.html_output import format_html_standalone
 
 
 class TestDiffToPatchRoundtrip:

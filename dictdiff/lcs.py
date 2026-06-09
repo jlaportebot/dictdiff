@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from dictdiff.core import Change, DiffResult
+from dictdiff.core import DiffResult
 
 
 @dataclass
@@ -165,7 +165,15 @@ def diff_lcs(old: list[Any], new: list[Any]) -> EditScript:
             new_j += 1
 
         # Equal item
-        script.ops.append(EditOp(op="equal", old_idx=old_i, new_idx=new_j, old_value=old[old_i], new_value=new[new_j]))
+        script.ops.append(
+            EditOp(
+                op="equal",
+                old_idx=old_i,
+                new_idx=new_j,
+                old_value=old[old_i],
+                new_value=new[new_j],
+            )
+        )
         old_i += 1
         new_j += 1
 

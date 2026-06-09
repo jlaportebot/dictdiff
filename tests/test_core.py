@@ -1,7 +1,6 @@
 """Tests for dictdiff core diff logic."""
 
-import pytest
-from dictdiff.core import Change, DiffResult, diff
+from dictdiff.core import Change, diff
 
 
 class TestScalarDiff:
@@ -132,14 +131,18 @@ class TestDictDiff:
         assert "a" in result.children
         assert "b" in result.children["a"].children
         assert "c" in result.children["a"].children["b"].children
-        assert result.children["a"].children["b"].children["c"].changed == {"d": Change(old=1, new=2)}
+        assert result.children["a"].children["b"].children["c"].changed == {
+            "d": Change(old=1, new=2)
+        }
 
     def test_type_change_in_dict(self):
         result = diff({"a": "42"}, {"a": 42})
         assert result.type_changed == {"a": Change(old="42", new=42)}
 
     def test_ignore_keys(self):
-        result = diff({"a": 1, "b": 2, "c": 3}, {"a": 1, "b": 99, "c": 3}, ignore_keys={"b"})
+        result = diff(
+            {"a": 1, "b": 2, "c": 3}, {"a": 1, "b": 99, "c": 3}, ignore_keys={"b"}
+        )
         assert result.is_empty
 
     def test_multiple_changes(self):
@@ -188,7 +191,9 @@ class TestListDiff:
         new = [{"name": "Alice"}, {"name": "Charlie"}]
         result = diff(old, new)
         assert "1" in result.children
-        assert result.children["1"].changed == {"name": Change(old="Bob", new="Charlie")}
+        assert result.children["1"].changed == {
+            "name": Change(old="Bob", new="Charlie")
+        }
 
 
 class TestListSetMode:
@@ -222,7 +227,12 @@ class TestDiffResultSummary:
 
     def test_empty_summary(self):
         result = diff({"a": 1}, {"a": 1})
-        assert result.summary() == {"added": 0, "removed": 0, "changed": 0, "type_changed": 0}
+        assert result.summary() == {
+            "added": 0,
+            "removed": 0,
+            "changed": 0,
+            "type_changed": 0,
+        }
 
     def test_added_summary(self):
         result = diff({}, {"a": 1, "b": 2})

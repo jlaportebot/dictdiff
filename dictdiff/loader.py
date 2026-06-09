@@ -86,6 +86,7 @@ def load_string(content: str, *, format: str = "json") -> Any:
             return json.loads(content)
         elif format in ("yaml", "yml"):
             import yaml
+
             return yaml.safe_load(content)
         elif format == "toml":
             try:
@@ -178,7 +179,7 @@ def _load_python(path: Path) -> Any:
     """Load a Python dict from a .py file."""
     namespace: dict[str, Any] = {"__builtins__": {}}
     code = path.read_text(encoding="utf-8")
-    exec(compile(code, str(path), "exec"), namespace) # noqa: S102
+    exec(compile(code, str(path), "exec"), namespace)  # noqa: S102
 
     # Find the first dict value in the namespace (skip __builtins__)
     for key, value in namespace.items():

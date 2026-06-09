@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from typing import Any, Union
+from typing import Any
 
 
 class SchemaError(Exception):
@@ -93,9 +93,13 @@ class StringType(SchemaType):
             result.add_error(path, f"Expected string, got {type(value).__name__}")
             return result
         if len(value) < self.min_length:
-            result.add_error(path, f"String length {len(value)} < minimum {self.min_length}")
+            result.add_error(
+                path, f"String length {len(value)} < minimum {self.min_length}"
+            )
         if self.max_length is not None and len(value) > self.max_length:
-            result.add_error(path, f"String length {len(value)} > maximum {self.max_length}")
+            result.add_error(
+                path, f"String length {len(value)} > maximum {self.max_length}"
+            )
         if self.pattern is not None and not re.match(self.pattern, value):
             result.add_error(path, f"String does not match pattern '{self.pattern}'")
         return result
@@ -181,7 +185,9 @@ class EnumType(SchemaType):
                 result.add_error(path, f"Expected one of {self.values}, got None")
             return result
         if value not in self.values:
-            result.add_error(path, f"Value {value!r} not in allowed values {self.values!r}")
+            result.add_error(
+                path, f"Value {value!r} not in allowed values {self.values!r}"
+            )
         return result
 
 
@@ -204,9 +210,13 @@ class ListType(SchemaType):
             result.add_error(path, f"Expected list, got {type(value).__name__}")
             return result
         if len(value) < self.min_length:
-            result.add_error(path, f"List length {len(value)} < minimum {self.min_length}")
+            result.add_error(
+                path, f"List length {len(value)} < minimum {self.min_length}"
+            )
         if self.max_length is not None and len(value) > self.max_length:
-            result.add_error(path, f"List length {len(value)} > maximum {self.max_length}")
+            result.add_error(
+                path, f"List length {len(value)} > maximum {self.max_length}"
+            )
         if self.element_type is not None:
             for i, item in enumerate(value):
                 child = self.element_type.validate(item, path=f"{path}[{i}]")
@@ -283,7 +293,9 @@ class UnionType(SchemaType):
         # None matched — return the best (fewest errors) as the error report
         if best_result is not None:
             result = ValidationResult()
-            result.add_error(path, f"Value does not match any of {len(self.types)} union types")
+            result.add_error(
+                path, f"Value does not match any of {len(self.types)} union types"
+            )
             result.merge(best_result)
             return result
 

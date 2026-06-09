@@ -1,8 +1,7 @@
 """Tests for the HTML output module."""
 
-import pytest
 from dictdiff.html_output import format_html, format_html_standalone
-from dictdiff.core import DiffResult, Change, diff
+from dictdiff.core import DiffResult, diff
 
 
 class TestFormatHTML:

@@ -4,38 +4,100 @@ from __future__ import annotations
 
 import json
 import sys
-from pathlib import Path
 from typing import Any
 
 import click
 
-from dictdiff.core import DiffResult, diff
+from dictdiff.core import diff
 from dictdiff.formatter import format_diff, format_table, format_unified
 from dictdiff.patch import generate_patch, apply_patch
 from dictdiff.html_output import format_html
-from dictdiff.loader import load_file, detect_format
+from dictdiff.loader import load_file
 from dictdiff.merge3 import merge3
 from dictdiff.ignore import IgnoreMatcher, filter_dict
-from dictdiff.paths import extract_path, list_paths
+from dictdiff.paths import extract_path
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
 @click.argument("old_file", type=click.Path(exists=False))
 @click.argument("new_file", type=click.Path(exists=False))
-@click.option("--set-mode", is_flag=True, default=False, help="Compare lists as unordered sets.")
-@click.option("--lcs", "lcs_mode", is_flag=True, default=False, help="Use LCS-based list comparison (smarter reordering detection).")
-@click.option("--patch", "output_patch", is_flag=True, default=False, help="Output RFC 6902 JSON Patch.")
-@click.option("--apply", "apply_patch_file", type=click.Path(exists=False), default=None, help="Apply a JSON Patch file to OLD_FILE and output result.")
-@click.option("--ignore", multiple=True, help="Keys to ignore during comparison (repeatable).")
-@click.option("--ignore-pattern", multiple=True, help="Ignore patterns: glob, re:regex, /dotpath, or exact key.")
-@click.option("--float-tolerance", type=float, default=0.0, help="Tolerance for float comparison.")
-@click.option("--format", "fmt", type=click.Choice(["tree", "table", "unified", "json", "html"]), default="tree", help="Output format.")
-@click.option("--html", "html_output", is_flag=True, default=False, help="Output as standalone HTML report (shorthand for --format html).")
-@click.option("--quiet", "-q", is_flag=True, default=False, help="Only set exit code, no output.")
-@click.option("--path", "dot_path", default=None, help="Compare only at a specific dot-path (e.g. 'config.db').")
-@click.option("--merge", "merge_base", type=click.Path(exists=False), default=None, help="Three-way merge: BASE_FILE against OLD and NEW.")
-@click.option("--ours-wins", is_flag=True, default=True, help="In merge conflicts, prefer 'ours' (left file).")
-@click.option("--theirs-wins", is_flag=True, default=False, help="In merge conflicts, prefer 'theirs' (right file).")
+@click.option(
+    "--set-mode", is_flag=True, default=False, help="Compare lists as unordered sets."
+)
+@click.option(
+    "--lcs",
+    "lcs_mode",
+    is_flag=True,
+    default=False,
+    help="Use LCS-based list comparison (smarter reordering detection).",
+)
+@click.option(
+    "--patch",
+    "output_patch",
+    is_flag=True,
+    default=False,
+    help="Output RFC 6902 JSON Patch.",
+)
+@click.option(
+    "--apply",
+    "apply_patch_file",
+    type=click.Path(exists=False),
+    default=None,
+    help="Apply a JSON Patch file to OLD_FILE and output result.",
+)
+@click.option(
+    "--ignore", multiple=True, help="Keys to ignore during comparison (repeatable)."
+)
+@click.option(
+    "--ignore-pattern",
+    multiple=True,
+    help="Ignore patterns: glob, re:regex, /dotpath, or exact key.",
+)
+@click.option(
+    "--float-tolerance", type=float, default=0.0, help="Tolerance for float comparison."
+)
+@click.option(
+    "--format",
+    "fmt",
+    type=click.Choice(["tree", "table", "unified", "json", "html"]),
+    default="tree",
+    help="Output format.",
+)
+@click.option(
+    "--html",
+    "html_output",
+    is_flag=True,
+    default=False,
+    help="Output as standalone HTML report (shorthand for --format html).",
+)
+@click.option(
+    "--quiet", "-q", is_flag=True, default=False, help="Only set exit code, no output."
+)
+@click.option(
+    "--path",
+    "dot_path",
+    default=None,
+    help="Compare only at a specific dot-path (e.g. 'config.db').",
+)
+@click.option(
+    "--merge",
+    "merge_base",
+    type=click.Path(exists=False),
+    default=None,
+    help="Three-way merge: BASE_FILE against OLD and NEW.",
+)
+@click.option(
+    "--ours-wins",
+    is_flag=True,
+    default=True,
+    help="In merge conflicts, prefer 'ours' (left file).",
+)
+@click.option(
+    "--theirs-wins",
+    is_flag=True,
+    default=False,
+    help="In merge conflicts, prefer 'theirs' (right file).",
+)
 @click.version_option(version="0.2.0")
 def main(
     old_file: str,
@@ -131,7 +193,8 @@ def main(
             sys.exit(2)
 
     result = diff(
-        old_data, new_data,
+        old_data,
+        new_data,
         set_mode=set_mode,
         ignore_keys=ignore_keys,
         float_tolerance=float_tolerance,
@@ -176,7 +239,9 @@ def _format_merge_result(result: Any) -> None:
     console = Console()
 
     if result.has_conflicts:
-        console.print(f"\n[bold red]⚠ {result.conflict_count} conflict(s) detected[/bold red]\n")
+        console.print(
+            f"\n[bold red]⚠ {result.conflict_count} conflict(s) detected[/bold red]\n"
+        )
 
         if result.conflicts:
             table = Table(title="Merge Conflicts", show_lines=True)
@@ -196,7 +261,7 @@ def _format_merge_result(result: Any) -> None:
     else:
         console.print("[green]✓ Merge completed with no conflicts[/green]")
 
-    console.print(f"\n[bold]Merged result:[/bold]")
+    console.print("\n[bold]Merged result:[/bold]")
     console.print(json.dumps(result.merged, indent=2))
 
 

@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from dictdiff.core import Change, DiffResult, diff
+from dictdiff.core import DiffResult, diff
 
 
 @dataclass
@@ -55,7 +55,12 @@ class MergeResult:
             "conflict_count": self.conflict_count,
             "merged_keys": len(self.merged),
             "conflicts": [
-                {"key": c.key, "base": c.base_value, "ours": c.ours_value, "theirs": c.theirs_value}
+                {
+                    "key": c.key,
+                    "base": c.base_value,
+                    "ours": c.ours_value,
+                    "theirs": c.theirs_value,
+                }
                 for c in self.conflicts
             ],
         }
@@ -100,8 +105,20 @@ def merge3(
 
     result = MergeResult()
 
-    our_changes = diff(base, ours, set_mode=set_mode, ignore_keys=ignore_keys, float_tolerance=float_tolerance)
-    their_changes = diff(base, theirs, set_mode=set_mode, ignore_keys=ignore_keys, float_tolerance=float_tolerance)
+    our_changes = diff(
+        base,
+        ours,
+        set_mode=set_mode,
+        ignore_keys=ignore_keys,
+        float_tolerance=float_tolerance,
+    )
+    their_changes = diff(
+        base,
+        theirs,
+        set_mode=set_mode,
+        ignore_keys=ignore_keys,
+        float_tolerance=float_tolerance,
+    )
 
     # Collect all keys from all three dicts
     all_keys = set(base.keys()) | set(ours.keys()) | set(theirs.keys())
@@ -179,7 +196,13 @@ def _merge_key(
             return
 
         # Both dicts → try recursive merge
-        if isinstance(ours_val, dict) and isinstance(theirs_val, dict) and isinstance(base_val, dict) if base_val is not _MISSING else False:
+        if (
+            isinstance(ours_val, dict)
+            and isinstance(theirs_val, dict)
+            and isinstance(base_val, dict)
+            if base_val is not _MISSING
+            else False
+        ):
             child_result = merge3(
                 base_val,
                 ours_val,
@@ -261,7 +284,12 @@ def _values_agree(a: Any, b: Any, *, float_tolerance: float = 0.0) -> bool:
     """Check if two values are effectively equal."""
     if type(a) is not type(b):
         # int/float compatibility
-        if isinstance(a, (int, float)) and isinstance(b, (int, float)) and not isinstance(a, bool) and not isinstance(b, bool):
+        if (
+            isinstance(a, (int, float))
+            and isinstance(b, (int, float))
+            and not isinstance(a, bool)
+            and not isinstance(b, bool)
+        ):
             if float_tolerance > 0:
                 return abs(float(a) - float(b)) <= float_tolerance
             return float(a) == float(b)
@@ -269,12 +297,20 @@ def _values_agree(a: Any, b: Any, *, float_tolerance: float = 0.0) -> bool:
     if isinstance(a, dict) and isinstance(b, dict):
         if set(a.keys()) != set(b.keys()):
             return False
-        return all(_values_agree(a[k], b[k], float_tolerance=float_tolerance) for k in a)
+        return all(
+            _values_agree(a[k], b[k], float_tolerance=float_tolerance) for k in a
+        )
     if isinstance(a, list) and isinstance(b, list):
         if len(a) != len(b):
             return False
-        return all(_values_agree(x, y, float_tolerance=float_tolerance) for x, y in zip(a, b))
-    if isinstance(a, (int, float)) and isinstance(b, (int, float)) and float_tolerance > 0:
+        return all(
+            _values_agree(x, y, float_tolerance=float_tolerance) for x, y in zip(a, b)
+        )
+    if (
+        isinstance(a, (int, float))
+        and isinstance(b, (int, float))
+        and float_tolerance > 0
+    ):
         return abs(float(a) - float(b)) <= float_tolerance
     return a == b
 

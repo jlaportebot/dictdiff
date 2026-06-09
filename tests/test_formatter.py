@@ -1,10 +1,5 @@
 """Tests for dictdiff formatter."""
 
-import pytest
-from io import StringIO
-
-from rich.console import Console
-
 from dictdiff.core import diff
 from dictdiff.formatter import format_unified, _format_value
 

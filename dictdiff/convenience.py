@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
 from dictdiff.core import DiffResult, diff
 from dictdiff.patch import generate_patch
-from dictdiff.loader import load_file, load_string, detect_format
+from dictdiff.loader import load_file, load_string
 from dictdiff.ignore import IgnoreMatcher, filter_dict
 
 
@@ -44,11 +43,16 @@ def diff_files(
     # Apply ignore patterns if provided
     if ignore_patterns:
         matcher = IgnoreMatcher.from_patterns(ignore_patterns)
-        old_data = filter_dict(old_data, matcher) if isinstance(old_data, dict) else old_data
-        new_data = filter_dict(new_data, matcher) if isinstance(new_data, dict) else new_data
+        old_data = (
+            filter_dict(old_data, matcher) if isinstance(old_data, dict) else old_data
+        )
+        new_data = (
+            filter_dict(new_data, matcher) if isinstance(new_data, dict) else new_data
+        )
 
     return diff(
-        old_data, new_data,
+        old_data,
+        new_data,
         set_mode=set_mode,
         ignore_keys=ignore_keys,
         float_tolerance=float_tolerance,
@@ -83,7 +87,8 @@ def diff_strings(
     old_data = load_string(old_json, format=format)
     new_data = load_string(new_json, format=format)
     return diff(
-        old_data, new_data,
+        old_data,
+        new_data,
         set_mode=set_mode,
         ignore_keys=ignore_keys,
         float_tolerance=float_tolerance,
@@ -116,7 +121,8 @@ def diff_to_patch(
         List of RFC 6902 patch operations.
     """
     result = diff(
-        old, new,
+        old,
+        new,
         set_mode=set_mode,
         ignore_keys=ignore_keys,
         float_tolerance=float_tolerance,

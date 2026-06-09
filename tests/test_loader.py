@@ -4,7 +4,6 @@ import json
 import os
 import tempfile
 import pytest
-from pathlib import Path
 
 from dictdiff.loader import load_file, load_string, detect_format, LoaderError
 
@@ -86,7 +85,7 @@ class TestLoadFile:
 
     def test_load_yaml_file(self):
         try:
-            import yaml
+            import yaml  # noqa: F401
         except ImportError:
             pytest.skip("PyYAML not installed")
         with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
@@ -101,10 +100,10 @@ class TestLoadFile:
 
     def test_load_toml_file(self):
         try:
-            import tomllib
+            import tomllib  # noqa: F401
         except ImportError:
             try:
-                import tomli
+                import tomli  # noqa: F401
             except ImportError:
                 pytest.skip("tomli/tomllib not available")
         with tempfile.NamedTemporaryFile(mode="w", suffix=".toml", delete=False) as f:

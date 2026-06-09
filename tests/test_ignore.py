@@ -1,6 +1,5 @@
 """Tests for the ignore pattern module."""
 
-import pytest
 from dictdiff.ignore import IgnoreMatcher, IgnoreRule, filter_dict
 
 
@@ -90,12 +89,14 @@ class TestIgnoreMatcher:
 
     def test_from_patterns(self):
         """Test IgnoreMatcher.from_patterns() class method."""
-        matcher = IgnoreMatcher.from_patterns([
-            "password",           # exact
-            "re:^_.*",            # regex
-            "secret_*",           # glob (matches dot_path)
-            "/config.db.host",    # dotpath
-        ])
+        matcher = IgnoreMatcher.from_patterns(
+            [
+                "password",  # exact
+                "re:^_.*",  # regex
+                "secret_*",  # glob (matches dot_path)
+                "/config.db.host",  # dotpath
+            ]
+        )
         # exact matches key name regardless of dot_path
         assert matcher.should_ignore("password", dot_path="auth.password")
         # regex matches the dot_path starting with _
